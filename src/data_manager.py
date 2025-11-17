@@ -16,21 +16,21 @@
 Data management, caching, and download manager
 """
 
+from datetime import datetime,timezone
 import json
 import os
 import csv
 import io
 import tempfile
 import logging
-from datetime import datetime,timezone
-
 import requests
+
+# Can't import DataDownloadError directly
+import src
 import src.const
 
-_LOGGER = logging.getLogger(__name__)
 
-class _DataManagerError(Exception):
-    """Base error for data manager (gets converted to DataDownloadError by caller)."""
+_LOGGER = logging.getLogger(__name__)
 
 class DataManager:
     """
@@ -47,15 +47,16 @@ class DataManager:
         :param request_timeout: HTTP request timeout in seconds
         :type request_timeout: int
         """
-        self._disable_caching = disable_caching
-        self._cache_file_path = os.path.join(
-            tempfile.gettempdir(), src.const.CACHE_FILE_NAME
-        )
         self._request_timeout = request_timeout
         self._raw_data_json = None
         self._actualized_time = datetime.min
         self._last_download_status = "Not yet run"
         self._etags = {}
+        self._disable_caching = disable_caching
+        self._cache_file_path = os.path.join(
+            tempfile.gettempdir(),
+            src.const.CACHE_FILE_NAME
+        )
 
 
     @property
@@ -79,7 +80,7 @@ class DataManager:
         Ensure raw data is loaded and fresh.
         Loads from cache if available, verifies freshness via ETags, downloads if needed.
 
-        :raises _DataManagerError, DataDownloadError: If no data can be retrieved from cache or download
+        :raises DataDownloadError: If no data can be retrieved from cache or download
         """
         cache_is_fresh = self._load_from_cache()
 
@@ -93,7 +94,7 @@ class DataManager:
             self._download_data()
 
         if not self._raw_data_json:
-            raise _DataManagerError(
+            raise src.DataDownloadError(
                 "Could not retrieve any air quality data from download or cache."
             )
 
@@ -108,6 +109,7 @@ class DataManager:
                  False if any resource is 200 (Modified) or network error
         :rtype: bool
         """
+
         if self._disable_caching:
             return True
 
@@ -164,6 +166,7 @@ class DataManager:
         :raises OSError: If cache file cannot be read
         :raises json.JSONDecodeError: If cache file is corrupted
         """
+
         if self._disable_caching:
             return False
         try:
@@ -230,8 +233,9 @@ class DataManager:
         """
         Download latest air quality data.
 
-        :raises _DataManagerError, DataDownloadError: If download fails and no cache available
+        :raises DataDownloadError: If download fails and no cache available
         """
+
         _LOGGER.info(
             "Attempting to download fresh data from OpenData CHMI endpoints..."
         )
@@ -269,7 +273,7 @@ class DataManager:
             aq_csv_str = download_results.get("aq_data_etag", {}).get("content")
 
             if metadata_data is None or aq_csv_str is None:
-                raise _DataManagerError(
+                raise src.DataDownloadError(
                     "Failed to download required data files. At least one file is missing or invalid."
                 )
 
@@ -293,7 +297,7 @@ class DataManager:
             self._last_download_status = f"Download failed: {exc}"
 
             if not self._raw_data_json and not self._load_from_cache():
-                raise _DataManagerError(
+                raise src.DataDownloadError(
                     f"Failed to download and no cache data is available: {exc}"
                 ) from exc
 
@@ -305,7 +309,7 @@ class DataManager:
             )
 
             if not self._raw_data_json and not self._load_from_cache():
-                raise _DataManagerError(
+                raise src.DataDownloadError(
                     f"Downloaded data is invalid and no cache data is available: {exc}"
                 ) from exc
 
@@ -326,12 +330,13 @@ class DataManager:
         :type aq_csv_str: str
         :return: Combined data dictionary
         :rtype: dict
-        :raises _DataManagerError, DataDownloadError: If inputs are invalid types
+        :raises DataDownloadError: If inputs are invalid types
         """
+
         if not isinstance(metadata_json, dict):
-            raise _DataManagerError("Metadata JSON is not a valid dictionary")
+            raise src.DataDownloadError("Metadata JSON is not a valid dictionary")
         if not isinstance(aq_csv_str, str):
-            raise _DataManagerError("AQ CSV data is not a valid string")
+            raise src.DataDownloadError("AQ CSV data is not a valid string")
 
         combined = {
             "Actualized": datetime.now(timezone.utc).isoformat(),
@@ -404,14 +409,19 @@ class DataManager:
         :return: Response object
         :rtype: requests.Response
         """
+
         headers = {
             "User-Agent": src.const.USER_AGENT,
             "Accept": "text/csv, application/json, application/octet-stream"
-        }
+        } # accept "text/csv" for futureproofing
+
         if etag_key in self._etags:
             headers["If-None-Match"] = self._etags[etag_key]
 
-        response = requests.get(url, headers=headers, timeout=self._request_timeout)
+        response = requests.get(url,
+            headers=headers,
+            timeout=self._request_timeout
+        )
         new_etag = response.headers.get("ETag")
 
         if new_etag:

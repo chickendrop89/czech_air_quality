@@ -461,62 +461,84 @@ class AirQuality:
         :raises StationNotFoundError: If no city/station found for the search term
         :raises PollutantNotReportedError: If none of the 5 nearest stations report this pollutant
         """
-        try:
-            station_data, _ = self.find_nearest_station(city_name)
-        except StationNotFoundError as exc:
-            raise exc
-
-        # Normalize pollutant code to match CHMI format (PM2.5 -> PM2_5)
+        station_data, _ = self.find_nearest_station(city_name)
         pollutant_code_normalized = pollutant_code.upper().replace(".", "_")
-
         nearby_stations = self._get_nearby_stations_sorted(city_name, limit=5)
-        stations_tried = []
+        stations_tried = [str(s.get("Name", "")) for s, _ in nearby_stations]
 
         for alt_station, _ in nearby_stations:
-            station_name = alt_station.get("Name")
-            stations_tried.append(station_name)
-            measurements = self._get_station_measurements(alt_station)
-
-            for measurement in measurements:
-                if measurement.get("ComponentCode") == pollutant_code_normalized:
-                    name = measurement.get("ComponentName", pollutant_code_normalized)
-                    unit = measurement.get("Unit", "N/A")
-                    value = measurement.get("value")
-                    value_float = None
-                    measurement_str = "N/A"
-                    status = "No Data Available"
-
-                    if self._is_valid_measurement(value):
-                        try:
-                            value_float = float(value)  # type: ignore
-                            measurement_str = f"{value} {unit}"
-                            status = "Measured"
-                        except (ValueError, TypeError):
-                            measurement_str = "N/A"
-                            status = "Invalid Value Format"
-
-                    if value_float is not None and value_float >= 0:
-                        if alt_station != station_data:
-                            _LOGGER.info(
-                                "Fallback: Using station %s for pollutant %s (searched through: %s).",
-                                station_name,
-                                pollutant_code_normalized,
-                                ", ".join(stations_tried),
-                            )
-                        return {
-                            "city_searched": city_name,
-                            "station_name": station_name,
-                            "pollutant_code": pollutant_code_normalized,
-                            "pollutant_name": name,
-                            "unit": unit,
-                            "value": value_float,
-                            "measurement_status": status,
-                            "formatted_measurement": measurement_str,
-                        }
+            result = self._try_get_pollutant_from_station(
+                alt_station, station_data, pollutant_code_normalized,
+                city_name, stations_tried
+            )
+            if result:
+                return result
 
         raise PollutantNotReportedError(
             f"No nearby station found that reports data for {pollutant_code_normalized}."
         )
+
+    def _try_get_pollutant_from_station(self, alt_station: dict, primary_station: dict,
+            pollutant_code: str, city_name: str, stations_tried: list[str]) -> dict | None:
+        """
+        Try to get a pollutant measurement from a specific station.
+
+        :param alt_station: Station to check
+        :param primary_station: Primary station (for logging fallback)
+        :param pollutant_code: Normalized pollutant code to find
+        :param city_name: City searched for (for result dict)
+        :param stations_tried: List of stations already tried (for logging)
+        :return: Measurement result dict or None if not found
+        """
+        station_name = alt_station.get("Name")
+        measurements = self._get_station_measurements(alt_station)
+
+        for measurement in measurements:
+            if measurement.get("ComponentCode") != pollutant_code:
+                continue
+
+            value = measurement.get("value")
+            value_float, measurement_str, status = self._process_measurement_value(
+                value, measurement.get("Unit", "N/A")
+            )
+
+            if value_float is not None and value_float >= 0:
+                if alt_station != primary_station:
+                    _LOGGER.info(
+                        "Fallback: Using station %s for pollutant %s (searched through: %s).",
+                        station_name, pollutant_code, ", ".join(stations_tried),
+                    )
+
+                return {
+                    "city_searched": city_name,
+                    "station_name": station_name,
+                    "pollutant_code": pollutant_code,
+                    "pollutant_name": measurement.get("ComponentName", pollutant_code),
+                    "unit": measurement.get("Unit", "N/A"),
+                    "value": value_float,
+                    "measurement_status": status,
+                    "formatted_measurement": measurement_str,
+                }
+
+        return None
+
+    def _process_measurement_value(self, value: str | None,
+            unit: str) -> tuple[float | None, str, str]:
+        """
+        Process and validate a measurement value.
+
+        :param value: Raw measurement value
+        :param unit: Unit of measurement
+        :return: (value_float, display_string, status) tuple
+        """
+        if self._is_valid_measurement(value):
+            try:
+                value_float = float(value)  # type: ignore
+                return value_float, f"{value} {unit}", "Measured"
+            except (ValueError, TypeError):
+                return None, "N/A", "Invalid Value Format"
+
+        return None, "N/A", "No Data Available"
 
 
     def _load_and_parse_data(self) -> None:
@@ -801,7 +823,6 @@ class AirQuality:
                         "idRegistration": id_reg,
                     }
                 )
-
         return measurements_list
 
 
@@ -824,126 +845,27 @@ class AirQuality:
         nearby_stations = self._get_nearby_stations_sorted(city_searched, limit=5)
 
         measurements = []
-        added_pollutants = set()
         stations_used = [station_data.get("Name", "")]
+        added_pollutants = set()
 
         for meas in measurements_list:
             code = meas.get("ComponentCode")
-            value = meas.get("value")
-            name = meas.get("ComponentName", code)
-            unit = meas.get("Unit", "N/A")
             added_pollutants.add(code)
 
-            status_text = "N/A"
-            value_float = None
-            sub_aqi = -1
-            used_station_name = station_data.get("Name")
-
-            if self._is_valid_measurement(value):
-                try:
-                    value_float = float(value)  # type: ignore
-                    status_text = f"{value} {unit}"
-                    if code:
-                        sub_aqi = self._calculate_e_aqi_subindex(code, value_float)
-                except (ValueError, TypeError):
-                    status_text = "Invalid Value Format"
-            else:
-                if code:
-                    for alt_station, _ in nearby_stations:
-                        alt_station_name = alt_station.get("Name")
-                        if alt_station_name == used_station_name:
-                            continue
-
-                        alt_measurements = self._get_station_measurements(alt_station)
-                        for alt_meas in alt_measurements:
-                            if alt_meas.get("ComponentCode") == code:
-                                alt_value = alt_meas.get("value")
-                                if self._is_valid_measurement(alt_value):
-                                    try:
-                                        value_float = float(alt_value)  # type: ignore
-                                        status_text = f"{alt_value} {unit}"
-                                        sub_aqi = self._calculate_e_aqi_subindex(code, value_float)
-                                        used_station_name = alt_station_name
-
-                                        if alt_station_name not in stations_used:
-                                            stations_used.append(alt_station_name)
-
-                                        _LOGGER.info(
-                                            "Fallback: Using station %s for pollutant %s in report",
-                                            alt_station_name,
-                                            code,
-                                        )
-                                        break
-                                    except (ValueError, TypeError):
-                                        continue
-
-                        if value_float is not None:
-                            break
-
-                if value_float is None:
-                    status_text = "No Data Available"
-
-            measurements.append(
-                {
-                    "pollutant_code": code,
-                    "pollutant_name": name,
-                    "unit": unit,
-                    "value": value_float,
-                    "sub_aqi": sub_aqi,
-                    "formatted_measurement": status_text,
-                }
+            measurement_data = self._build_measurement_entry(
+                meas, code, station_data, nearby_stations, stations_used
             )
+            measurements.append(measurement_data)
 
-        all_available_pollutants = {}
-        for alt_station, _ in nearby_stations:
-            if alt_station.get("Name") == station_data.get("Name"):
-                continue
-
-            alt_measurements = self._get_station_measurements(alt_station)
-            for alt_meas in alt_measurements:
-                code = alt_meas.get("ComponentCode")
-                if code and code not in added_pollutants and code not in all_available_pollutants:
-                    value = alt_meas.get("value")
-                    if self._is_valid_measurement(value):
-                        all_available_pollutants[code] = (alt_station, alt_meas)
-
-        for code, (alt_station, alt_meas) in all_available_pollutants.items():
-            value = alt_meas.get("value")
-            name = alt_meas.get("ComponentName", code)
-            unit = alt_meas.get("Unit", "N/A")
-            alt_station_name = alt_station.get("Name")
-
-            status_text = "N/A"
-            value_float = None
-            sub_aqi = -1
-
-            try:
-                value_float = float(value)  # type: ignore
-                status_text = f"{value} {unit}"
-                sub_aqi = self._calculate_e_aqi_subindex(code, value_float)
-
-                if alt_station_name not in stations_used:
-                    stations_used.append(alt_station_name)
-
-                _LOGGER.info(
-                    "Fallback: Adding pollutant %s from station %s (not measured by primary station %s).",
-                    code,
-                    alt_station_name,
-                    station_data.get("Name"),
-                )
-            except (ValueError, TypeError):
-                status_text = "Invalid Value Format"
-
-            measurements.append(
-                {
-                    "pollutant_code": code,
-                    "pollutant_name": name,
-                    "unit": unit,
-                    "value": value_float,
-                    "sub_aqi": sub_aqi,
-                    "formatted_measurement": status_text,
-                }
+        extra_pollutants = self._find_extra_pollutants(
+            nearby_stations, station_data, added_pollutants
+        )
+        for code, (alt_station, alt_meas) in extra_pollutants.items():
+            measurement_data = self._build_extra_pollutant_entry(
+                alt_meas, alt_station, station_data, stations_used
             )
+            measurements.append(measurement_data)
+
         combined_station_name = ", ".join(stations_used)
 
         return {
@@ -956,4 +878,176 @@ class AirQuality:
             "air_quality_index_description": self._get_aqi_description(overall_aqi_value),
             "actualized_time_utc": self._data_manager.actualized_time.isoformat(),
             "measurements": measurements,
+        }
+
+
+    def _build_measurement_entry(self, meas: dict, code: str | None,
+            primary_station: dict, nearby_stations: list[tuple[dict, float]],
+            stations_used: list[str]) -> dict:
+        """
+        Build a measurement entry, using fallback stations if needed.
+
+        :param meas: Measurement from primary station
+        :param code: Pollutant code
+        :param primary_station: Primary station data
+        :param nearby_stations: List of nearby stations for fallback
+        :param stations_used: List accumulator for station names
+        :return: Formatted measurement dictionary
+        """
+        name = meas.get("ComponentName", code)
+        unit = meas.get("Unit", "N/A")
+        value = meas.get("value")
+        value_float = None
+        status_text = "N/A"
+        sub_aqi = -1
+
+        if self._is_valid_measurement(value):
+            value_float, status_text, sub_aqi = self._process_valid_measurement(
+                str(value), unit, code
+            )
+        elif code:
+            value_float, status_text, sub_aqi, _ = self._find_measurement_fallback(
+                code, unit, primary_station, nearby_stations, stations_used
+            )
+
+        if value_float is None:
+            status_text = "No Data Available"
+
+        return {
+            "pollutant_code": code,
+            "pollutant_name": name,
+            "unit": unit,
+            "value": value_float,
+            "sub_aqi": sub_aqi,
+            "formatted_measurement": status_text,
+        }
+
+
+    def _process_valid_measurement(self, value:
+            str, unit: str, code: str | None) -> tuple[float | None, str, int]:
+        """
+        Process a valid measurement value.
+
+        :return: (value_float, status_text, sub_aqi) tuple
+        """
+        try:
+            value_float = float(value)
+            status_text = f"{value} {unit}"
+            sub_aqi = self._calculate_e_aqi_subindex(code, value_float) if code else -1
+            return value_float, status_text, sub_aqi
+        except (ValueError, TypeError):
+            return None, "Invalid Value Format", -1
+
+
+    def _find_measurement_fallback(self, code: str, unit: str,
+            primary_station: dict, nearby_stations: list[tuple[dict, float]],
+            stations_used: list[str]) -> tuple[float | None, str, int, str | None]:
+        """
+        Search nearby stations for a measurement with fallback logic.
+
+        :return: (value_float, status_text, sub_aqi, used_station_name) tuple
+        """
+        primary_name = primary_station.get("Name")
+        value_float = None
+        status_text = "No Data Available"
+        sub_aqi = -1
+        used_station_name = primary_name
+
+        for alt_station, _ in nearby_stations:
+            alt_station_name = alt_station.get("Name")
+            if alt_station_name == primary_name:
+                continue
+
+            alt_measurements = self._get_station_measurements(alt_station)
+            for alt_meas in alt_measurements:
+                if alt_meas.get("ComponentCode") == code:
+                    alt_value = alt_meas.get("value")
+                    if self._is_valid_measurement(alt_value):
+                        value_float, status_text, sub_aqi = self._process_valid_measurement(
+                            str(alt_value), unit, code
+                        )
+                        if value_float is not None:
+                            used_station_name = alt_station_name
+                            if alt_station_name and alt_station_name not in stations_used:
+                                stations_used.append(alt_station_name)
+                            _LOGGER.info(
+                                "Fallback: Using station %s for pollutant %s in report",
+                                alt_station_name, code,
+                            )
+                            return value_float, status_text, sub_aqi, used_station_name
+
+            if value_float is not None:
+                break
+
+        return value_float, status_text, sub_aqi, used_station_name
+
+
+    def _find_extra_pollutants(self, nearby_stations: list[tuple[dict, float]],
+            primary_station: dict, added_pollutants: set) -> dict[str, tuple[dict, dict]]:
+        """
+        Find pollutants available in nearby stations but not in primary station.
+
+        :return: Dictionary mapping pollutant code to (station, measurement)
+        """
+        extra_pollutants = {}
+
+        for alt_station, _ in nearby_stations:
+            if alt_station.get("Name") == primary_station.get("Name"):
+                continue
+
+            alt_measurements = self._get_station_measurements(alt_station)
+            for alt_meas in alt_measurements:
+                code = alt_meas.get("ComponentCode")
+                if code and code not in added_pollutants and code not in extra_pollutants:
+                    value = alt_meas.get("value")
+                    if self._is_valid_measurement(value):
+                        extra_pollutants[code] = (alt_station, alt_meas)
+
+        return extra_pollutants
+
+
+    def _build_extra_pollutant_entry(self, meas: dict, alt_station: dict,
+            primary_station: dict, stations_used: list[str]) -> dict:
+        """
+        Build a measurement entry for an extra pollutant from nearby station.
+
+        :param meas: Measurement from alternative station
+        :param alt_station: Station providing the measurement
+        :param primary_station: Primary station (for logging)
+        :param stations_used: List accumulator for station names
+        :return: Formatted measurement dictionary
+        """
+        code = meas.get("ComponentCode")
+        name = meas.get("ComponentName", code)
+        unit = meas.get("Unit", "N/A")
+        value = meas.get("value")
+        alt_station_name = alt_station.get("Name")
+
+        status_text = "N/A"
+        value_float = None
+        sub_aqi = -1
+
+        try:
+            value_float = float(value)  # type: ignore
+            status_text = f"{value} {unit}"
+            if code:
+                sub_aqi = self._calculate_e_aqi_subindex(code, value_float)
+
+            if alt_station_name and alt_station_name not in stations_used:
+                stations_used.append(alt_station_name)
+
+            _LOGGER.info(
+                "Fallback: Adding pollutant %s from station %s (not measured by primary station %s).",
+                code, alt_station_name, primary_station.get("Name"),
+            )
+        except (ValueError, TypeError):
+            status_text = "Invalid Value Format"
+
+        return {
+            "pollutant_code": code,
+            "pollutant_name": name,
+            "unit": unit,
+            "value": value_float,
+            "sub_aqi": sub_aqi,
+            "formatted_measurement": status_text,
         }
