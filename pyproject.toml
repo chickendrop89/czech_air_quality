@@ -1,3 +1,39 @@
 [build-system]
 requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "czech-air-quality"
+version = "0.0.1"
+description = "A python library for retrieving and parsing air quality data from the chmi opendata portal."
+readme = "README.md"
+authors = [
+    { name = "chickendrop89", email = "chickendrop89@gmail.com" }
+]
+license = { file = "LICENSE" }
+keywords = ["air-quality", "chmi", "czechia", "pollution", "aqi", "geopy"]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.28.0",
+    "geopy>=2.3.0",
+]
+
+[project.urls]
+Repository = "https://github.com/chickendrop89/czech-air-quality"
+Issues     = "https://github.com/chickendrop89/czech-air-quality/issues"
+Changelog  = "https://github.com/chickendrop89/czech-air-quality/blob/master/CHANGELOG.md"
+Homepage   = "https://github.com/chickendrop89/czech-air-quality/blob/master/README.md"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.1",
+    "coverage>=7.11.3",
+    "pylint>=4.0.3",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
