@@ -97,7 +97,8 @@ class AirQuality:
         :type disable_caching: bool
         :param auto_load: Load/download data immediately
         :type auto_load: bool
-        :param use_nominatim: Enable Nominatim geocoding for city lookups (True) or only exact station names (False)
+        :param use_nominatim: Enable Nominatim for city lookups (True)
+            or only exact station names (False)
         :type use_nominatim: bool
         :param nominatim_timeout: Geocoding timeout in seconds
         :type nominatim_timeout: int
@@ -222,7 +223,7 @@ class AirQuality:
             return self._city_coordinate_cache[city_name]
 
         if not self._use_nominatim or self._rate_limited_geocode is None:
-            _LOGGER.debug("Nominatim geocoding disabled. Cannot lookup coordinates for '%s'.", city_name)
+            _LOGGER.debug("Nominatim geocoding disabled. Cannot lookup '%s'.", city_name)
             return None
 
         _LOGGER.info("Attempting external geocoding for '%s'...", city_name)
@@ -273,7 +274,8 @@ class AirQuality:
 
         if not self._use_nominatim:
             raise StationNotFoundError(
-                f"No exact station match found for '{city_name}', and nominatim geocoding is disabled."
+                f"""No exact station match found for '{city_name}',
+                and nominatim geocoding is disabled."""
             )
 
         _LOGGER.info(
@@ -283,7 +285,8 @@ class AirQuality:
         city_coords = self.get_city_coordinates(city_name)
         if not city_coords:
             raise StationNotFoundError(
-                f"Could not find geographic coordinates for '{city_name}'. Please use a known station name or a different city."
+                f"""Could not find geographic coordinates for '{city_name}'.
+                Please use a known station name or a different city."""
             )
 
         nearest_station = None
@@ -423,7 +426,7 @@ class AirQuality:
             for alt_station, alt_distance in nearby_stations[1:]:
                 if self._station_has_valid_data(alt_station):
                     _LOGGER.info(
-                        "Fallback: Using station %s at %.2f km (primary station had no valid data).",
+                        "Fallback: Using station %s at %.2f km (1st station had no valid data).",
                         alt_station.get("Name"),
                         alt_distance,
                     )
@@ -450,7 +453,8 @@ class AirQuality:
         :type pollutant_code: str
         :return: Measurement dictionary with keys:
                 - city_searched (str): Original search term
-                - station_name (str): Station name(s) that provided the measurement (comma-separated if multiple)
+                - station_name (str): Station name(s) that provided the measurement 
+                    (comma-separated if multiple)
                 - pollutant_code (str): Pollutant code (uppercase with underscores)
                 - pollutant_name (str): Full pollutant name
                 - unit (str): Measurement unit (e.g., 'µg/m³')
@@ -627,7 +631,8 @@ class AirQuality:
             return False
 
 
-    def _get_nearby_stations_sorted(self, city_name: str, limit: int = 5) -> list[tuple[dict, float]]:
+    def _get_nearby_stations_sorted(self, city_name: str,
+            limit: int = 5) -> list[tuple[dict, float]]:
         """
         Get a list of nearby stations sorted by distance.
 
@@ -1037,7 +1042,7 @@ class AirQuality:
                 stations_used.append(alt_station_name)
 
             _LOGGER.info(
-                "Fallback: Adding pollutant %s from station %s (not measured by primary station %s).",
+                "Fallback: Adding pollutant %s from station %s (not measured by 1st station %s).",
                 code, alt_station_name, primary_station.get("Name"),
             )
         except (ValueError, TypeError):

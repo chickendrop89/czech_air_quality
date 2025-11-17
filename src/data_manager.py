@@ -38,7 +38,8 @@ class DataManager:
     Handles ETag-based conditional downloads, local caching, and data combination.
     """
 
-    def __init__(self, disable_caching: bool = False, request_timeout: int = src.const.REQUEST_TIMEOUT):
+    def __init__(self, disable_caching: bool = False,
+            request_timeout: int = src.const.REQUEST_TIMEOUT):
         """
         Initialize the DataManager.
 
@@ -184,7 +185,8 @@ class DataManager:
 
             cache_data[src.const.CACHE_METADATA_KEY] = metadata
             self._raw_data_json = json.dumps(cache_data, ensure_ascii=False)
-            self._last_download_status = f"Loaded data from cache (pending ETag validation). Actualized at {self._actualized_time.strftime('%Y-%m-%d %H:%M')}"
+            self._last_download_status = f"""Loaded data from cache (pending ETag validation).
+                Updated at {self._actualized_time.strftime('%Y-%m-%d %H:%M')}"""
 
             _LOGGER.info(
                 "Loaded data and ETags from cache. Timestamp: %s. Awaiting network validation.",
@@ -264,7 +266,7 @@ class DataManager:
             if not is_modified and self._raw_data_json:
                 timestamp = datetime.now(timezone.utc)
                 self._actualized_time = timestamp
-                self._last_download_status = f"Success. Cache refreshed at {timestamp.strftime('%Y-%m-%d %H:%M')}"
+                self._last_download_status = f"Success. Refreshed at {timestamp.strftime('%Y-%m-%d %H:%M')}"
                 self._save_to_cache(self._raw_data_json)
                 _LOGGER.info("All resources were Not Modified (304). Using existing data.")
                 return
@@ -274,7 +276,8 @@ class DataManager:
 
             if metadata_data is None or aq_csv_str is None:
                 raise src.DataDownloadError(
-                    "Failed to download required data files. At least one file is missing or invalid."
+                    """Failed to download required data files. 
+                    At least one file is missing or invalid."""
                 )
 
             combined_data = self._combine_downloaded_data(
