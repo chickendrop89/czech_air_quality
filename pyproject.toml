@@ -11,10 +11,17 @@ authors = [
     { name = "chickendrop89", email = "chickendrop89@gmail.com" }
 ]
 license = { file = "LICENSE" }
-keywords = ["air-quality", "chmi", "czechia", "pollution", "aqi", "geopy"]
+keywords = ["air-quality", "chmi", "czechia", "pollution", "aqi", "eaqi", "geopy"]
 classifiers = [
-    "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+    "Topic :: Internet :: WWW/HTTP",
+    "Typing :: Typed"
 ]
 requires-python = ">=3.10"
 dependencies = [
