@@ -17,7 +17,7 @@ Provides a python client for simply retrieving
 and processing air quality data from the CHMI OpenData portal.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 from .airquality import (
     AirQuality,

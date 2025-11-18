@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "czech_air_quality"
-version = "1.0.0"
+version = "1.0.1"
 description = "A python library for retrieving and parsing air quality data from the chmi opendata portal."
 readme = "README.md"
 authors = [
