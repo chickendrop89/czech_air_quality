@@ -376,7 +376,7 @@ class AirQualityCalculations:
                 )
                 continue
 
-        return max_aqi if max_aqi > 0 else -1
+        return max_aqi if max_aqi > 0 else 0
 
 
     def _try_get_pollutant_from_station(self, alt_station: dict, primary_station: dict,
