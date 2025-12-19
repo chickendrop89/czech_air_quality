@@ -50,7 +50,8 @@ NOMINATIM_TIMEOUT = 10
 ###########################
 
 # Threshold for pollutant values considered as Error/N/A
-# Value that is X or above will be accepted
+# Value that is X or above will be accepted.
+# If a station reports "1.0" value for a pollutant, it is likely an error.
 CHMI_ERROR_THRESHOLD = 1.1
 
 # Maximum number of neighbour stations to consider merging 
