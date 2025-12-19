@@ -283,7 +283,7 @@ class AirQuality(AirQualityCalculations):
         :param pollutant_code: Pollutant code to retrieve (case-insensitive):
 
             - 'PM10': Particulate matter < 10 µm
-            - 'PM2.5': Fine particulate matter < 2.5 µm  
+            - 'PM2_5': Fine particulate matter < 2.5 µm  
             - 'O3': Ozone
             - 'NO2': Nitrogen dioxide
             - 'SO2': Sulfur dioxide
@@ -351,7 +351,7 @@ class AirQuality(AirQualityCalculations):
         """
         Get EAQI for a city using the 0-6 scale.
 
-        Returns the highest sub-index across all measured pollutants (PM10, PM2.5, O3, NO2, SO2).
+        Returns the highest sub-index across all measured pollutants (PM10, PM2_5, O3, NO2, SO2).
 
         :param city_name: Name of the city
         :type city_name: str
