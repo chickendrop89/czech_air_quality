@@ -261,7 +261,7 @@ class DataManager:
             )
 
             _LOGGER.debug("Fresh data and ETags saved to cache.")
-        except (CacheError) as exc:
+        except CacheError as exc:
             _warn(f"Could not save data to cache file: {exc}")
 
 
