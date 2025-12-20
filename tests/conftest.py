@@ -39,7 +39,7 @@ def mock_data_manager():
 
 @pytest.fixture
 def mock_stations():
-    """Provide realistic mock station data"""
+    """Provide mock station data"""
     return [
         {
             "Name": "Ostrava-Fifejdy",
@@ -70,7 +70,7 @@ def mock_stations():
 
 @pytest.fixture
 def mock_measurements():
-    """Provide realistic mock measurement data"""
+    """Provide mock measurement data"""
     return {
         "40555": {
             "ComponentCode": "SO2",
@@ -167,7 +167,7 @@ def mock_measurements():
 
 @pytest.fixture
 def mock_metadata():
-    """Provide realistic mock metadata structure"""
+    """Provide mock metadata structure"""
     return {
         "Localities": [
             {

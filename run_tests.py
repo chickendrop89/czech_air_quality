@@ -53,7 +53,7 @@ def run_tests(test_module: str | None = None, verbosity: int = 2, coverage: bool
     if test_module:
         try:
             suite = loader.loadTestsFromName(test_module)
-        except Exception as e:
+        except (ImportError, AttributeError, TypeError) as e:
             print(f"Error loading test module '{test_module}': {e}")
             return False
     else:

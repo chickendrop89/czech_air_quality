@@ -39,12 +39,14 @@ class TestDataManagerInitialization(unittest.TestCase):
 
         self.assertFalse(dm._disable_caching)
 
+
     @patch("src.czech_air_quality.data_manager.requests.get")
     def test_init_caching_disabled(self, _):
         """Test initialization with caching disabled."""
         dm = DataManager(disable_caching=True)
 
         self.assertTrue(dm._disable_caching)
+
 
     @patch("src.czech_air_quality.data_manager.requests.get")
     def test_init_custom_timeout(self, _):
@@ -65,6 +67,7 @@ class TestDataManagerCaching(unittest.TestCase):
         dm = DataManager()
 
         self.assertIn(CACHE_FILE_NAME, dm._cache_file_path)
+
 
     @patch("src.czech_air_quality.data_manager.requests.get")
     def test_disable_caching_flag(self, _):
@@ -90,6 +93,7 @@ class TestETagValidation(unittest.TestCase):
 
         self.assertIsInstance(result, bool)
 
+
     @patch("src.czech_air_quality.data_manager.requests.get")
     def test_is_data_fresh_without_etags(self, _):
         """Test is_data_fresh when no ETags are cached."""
@@ -109,6 +113,7 @@ class TestDataCombination(unittest.TestCase):
         """Set up test fixtures."""
         self.dm = DataManager()
 
+
     def test_data_manager_initialization(self):
         """Test that DataManager initializes properly."""
         self.assertIsNotNone(self.dm)
@@ -124,6 +129,7 @@ class TestDataValidation(unittest.TestCase):
         with patch("src.czech_air_quality.data_manager.requests.get"):
             self.dm = DataManager()
 
+
     def test_validate_metadata_valid_structure(self):
         """Test validation of valid metadata structure."""
         valid_metadata = {"Localities": [], "id_registration_to_component": {}}
@@ -133,6 +139,7 @@ class TestDataValidation(unittest.TestCase):
             valid_metadata, "idRegistration,value"
         )
         self.assertIsNotNone(result)
+
 
     def test_validate_csv_valid_format(self):
         """Test validation of valid CSV format."""

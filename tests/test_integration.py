@@ -37,11 +37,11 @@ class TestStationFinding(unittest.TestCase):
         mock_dm.return_value.raw_data_json = '{"Localities": []}'
         mock_dm.return_value.is_data_fresh.return_value = True
         mock_dm.return_value._raw_data_json = '{"Localities": []}'
-        
+
         aq = AirQuality(auto_load=False)
         aq._use_nominatim = False
         aq._data = {"Localities": []}
-        
+
         aq._all_stations = [
             {
                 "Name": "Praha - Vinohrady",
@@ -85,6 +85,7 @@ class TestAirQualityProperties(unittest.TestCase):
         result = aq.all_stations
         self.assertIsInstance(result, list)
 
+
     @patch("src.czech_air_quality.data_manager.DataManager")
     def test_component_lookup_property(self, mock_dm):
         """Test component_lookup property returns dict."""
@@ -94,6 +95,7 @@ class TestAirQualityProperties(unittest.TestCase):
         result = aq.component_lookup
         self.assertIsInstance(result, dict)
 
+
     @patch("src.czech_air_quality.data_manager.DataManager")
     def test_raw_data_property(self, mock_dm):
         """Test raw_data property returns dict."""
@@ -102,6 +104,7 @@ class TestAirQualityProperties(unittest.TestCase):
 
         result = aq.raw_data
         self.assertIsInstance(result, dict)
+
 
     @patch("src.czech_air_quality.data_manager.DataManager")
     def test_actualized_time_property(self, mock_dm):
@@ -113,6 +116,7 @@ class TestAirQualityProperties(unittest.TestCase):
 
         result = aq.actualized_time
         self.assertIsInstance(result, datetime)
+
 
     @patch("src.czech_air_quality.data_manager.DataManager")
     def test_is_data_fresh_property(self, mock_dm):

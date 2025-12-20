@@ -36,11 +36,13 @@ class TestURLConstants(unittest.TestCase):
         self.assertEqual(result.scheme, "https")
         self.assertIn("chmi.cz", result.netloc)
 
+
     def test_metadata_url_is_valid(self):
         """Test that METADATA_URL is a valid URL."""
         result = urlparse(METADATA_URL)
         self.assertEqual(result.scheme, "https")
         self.assertIn("chmi.cz", result.netloc)
+
 
     def test_urls_are_different(self):
         """Test that AQ_DATA_URL and METADATA_URL are different."""
@@ -54,17 +56,21 @@ class TestTimeoutConstants(unittest.TestCase):
         """Test that NOMINATIM_TIMEOUT is positive."""
         self.assertGreater(NOMINATIM_TIMEOUT, 0)
 
+
     def test_request_timeout_positive(self):
         """Test that REQUEST_TIMEOUT is positive."""
         self.assertGreater(REQUEST_TIMEOUT, 0)
+
 
     def test_nominatim_timeout_reasonable(self):
         """Test that NOMINATIM_TIMEOUT is reasonable (not excessive)."""
         self.assertLess(NOMINATIM_TIMEOUT, 60)
 
+
     def test_request_timeout_reasonable(self):
         """Test that REQUEST_TIMEOUT is reasonable (not excessive)."""
         self.assertLess(REQUEST_TIMEOUT, 120)
+
 
     def test_request_timeout_greater_than_nominatim(self):
         """Test that REQUEST_TIMEOUT >= NOMINATIM_TIMEOUT."""
@@ -78,9 +84,11 @@ class TestUserAgent(unittest.TestCase):
         """Test that USER_AGENT includes library name."""
         self.assertIn("czech_air_quality", USER_AGENT)
 
+
     def test_user_agent_contains_version(self):
         """Test that USER_AGENT includes version number."""
         self.assertIn(__version__, USER_AGENT)
+
 
     def test_user_agent_format(self):
         """Test USER_AGENT has standard format."""
@@ -98,6 +106,7 @@ class TestEAQIBands(unittest.TestCase):
         for pollutant in required_pollutants:
             self.assertIn(pollutant, EAQI_BANDS)
 
+
     def test_eaqi_bands_are_lists(self):
         """Test that EAQI_BANDS values are lists of tuples."""
         for _, bands in EAQI_BANDS.items():
@@ -107,6 +116,7 @@ class TestEAQIBands(unittest.TestCase):
             for band in bands:
                 self.assertIsInstance(band, tuple)
                 self.assertEqual(len(band), 2)
+
 
     def test_eaqi_bands_values_ascending(self):
         """Test that EAQI band concentration limits are ascending."""
@@ -121,6 +131,7 @@ class TestEAQIBands(unittest.TestCase):
                 )
                 prev_concentration = concentration
 
+
     def test_eaqi_bands_aqi_values_positive(self):
         """Test that EAQI AQI values are positive."""
         for pollutant, bands in EAQI_BANDS.items():
@@ -128,6 +139,7 @@ class TestEAQIBands(unittest.TestCase):
                 self.assertGreater(
                     aqi_value, 0, msg=f"{pollutant} has non-positive AQI value"
                 )
+
 
     def test_eaqi_bands_aqi_values_ascending(self):
         """Test that AQI values increase with concentration."""
@@ -140,11 +152,13 @@ class TestEAQIBands(unittest.TestCase):
                 )
                 prev_aqi = aqi_value
 
+
     def test_pm10_bands_first_value(self):
         """Test PM10 specific band values (sanity check)."""
         pm10_bands = EAQI_BANDS["PM10"]
         # First band should be (1, 20) - Level 1 at 20 µg/m³
         self.assertEqual(pm10_bands[0], (1, 20))
+
 
     def test_o3_bands_first_value(self):
         """Test O3 specific band values (sanity check)."""
@@ -161,15 +175,18 @@ class TestEAQILevels(unittest.TestCase):
         self.assertIsInstance(EAQI_LEVELS, dict)
         self.assertGreater(len(EAQI_LEVELS), 0)
 
+
     def test_eaqi_levels_keys_are_numbers(self):
         """Test EAQI_LEVELS keys are numeric."""
         for key in EAQI_LEVELS:
             self.assertIsInstance(key, int)
 
+
     def test_eaqi_levels_values_are_strings(self):
         """Test EAQI_LEVELS values are strings."""
         for value in EAQI_LEVELS.values():
             self.assertIsInstance(value, str)
+
 
     def test_eaqi_levels_has_required_descriptions(self):
         """Test EAQI_LEVELS includes required descriptions."""
@@ -179,6 +196,7 @@ class TestEAQILevels(unittest.TestCase):
 
         for description in required_descriptions:
             self.assertIn(description, all_descriptions)
+
 
     def test_eaqi_levels_keys_ascending(self):
         """Test EAQI_LEVELS keys are in ascending order."""
@@ -193,13 +211,16 @@ class TestCacheConstants(unittest.TestCase):
         """Test CACHE_FILE_NAME is not empty."""
         self.assertGreater(len(CACHE_FILE_NAME), 0)
 
+
     def test_cache_file_name_has_extension(self):
         """Test CACHE_FILE_NAME has file extension."""
         self.assertTrue(CACHE_FILE_NAME.endswith(".json"))
 
+
     def test_cache_metadata_key_not_empty(self):
         """Test CACHE_METADATA_KEY is not empty."""
         self.assertGreater(len(CACHE_METADATA_KEY), 0)
+
 
     def test_etag_urls_structure(self):
         """Test ETAG_URLS has required keys."""
@@ -207,6 +228,7 @@ class TestCacheConstants(unittest.TestCase):
 
         for key in required_keys:
             self.assertIn(key, ETAG_URLS)
+
 
     def test_etag_urls_point_to_data_urls(self):
         """Test ETAG_URLS values match data URLs."""
