@@ -7,7 +7,7 @@ sys.path.insert(0, str(project_root / "src"))
 project = "czech_air_quality"
 copyright = "chickendrop89, 2025"
 author = "chickendrop89"
-release = "2.0.0"
+release = "2.0.1"
 
 extensions = [
     "sphinx.ext.autodoc",
