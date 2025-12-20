@@ -372,6 +372,6 @@ class AirQuality(AirQualityCalculations):
 
         :raises DataDownloadError: If network error occurs and no cache is available
         """
-        self._data_manager.ensure_latest_data()
+        self._data_manager.ensure_latest_data(force_fetch=True)
         self._load_and_parse_data()
 
