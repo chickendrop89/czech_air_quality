@@ -12,6 +12,8 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU Lesser General Public License for more details.
 
+# pylint: disable=protected-access
+
 """
 Integration tests for the czech_air_quality library.
 """

@@ -12,6 +12,9 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU Lesser General Public License for more details.
 
+# pylint: disable=protected-access
+# pylint: disable=wildcard-import, unused-wildcard-import
+
 """
 Unit tests for constants and configuration values.
 """

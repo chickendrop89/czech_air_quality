@@ -12,6 +12,8 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU Lesser General Public License for more details.
 
+# pylint: disable=protected-access
+
 """
 Pytest configuration and shared fixtures for tests.
 """

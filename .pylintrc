@@ -32,7 +32,6 @@ module-naming-style=snake_case
 no-docstring-rgx=__.*__
 variable-naming-style=snake_case
 include-naming-hint=yes
-ignore-patterns=**/tests/*.py
 
 [CLASSES]
 
