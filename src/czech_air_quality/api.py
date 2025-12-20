@@ -374,4 +374,3 @@ class AirQuality(AirQualityCalculations):
         """
         self._data_manager.ensure_latest_data(force_fetch=True)
         self._load_and_parse_data()
-

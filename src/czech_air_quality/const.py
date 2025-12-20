@@ -54,7 +54,7 @@ NOMINATIM_TIMEOUT = 10
 # If a station reports "1.0" value for a pollutant, it is likely an error.
 CHMI_ERROR_THRESHOLD = 1.1
 
-# Maximum number of neighbour stations to consider merging 
+# Maximum number of neighbour stations to consider merging
 # pollutants from
 CHMI_NEIGHBOUR_LIMIT = 20
 

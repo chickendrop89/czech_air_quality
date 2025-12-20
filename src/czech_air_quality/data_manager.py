@@ -376,7 +376,7 @@ class DataManager:
 
             self._actualized_time = timestamp
             self._raw_data_json = json.dumps(
-                combined_data, 
+                combined_data,
                 ensure_ascii=False
             )
 

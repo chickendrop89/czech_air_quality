@@ -60,3 +60,7 @@ min-similarity-lines=4
 
 check-quote-consistency=yes
 check-str-concat-over-line-jumps=yes
+
+[FORMAT]
+
+max-line-length=120
