@@ -12,8 +12,8 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU Lesser General Public License for more details.
 
-# Need to use _warn() in this library so ignore wrong-import-position
-# pylint: disable=C0413
+# Need to use _warn() in this library
+# pylint: disable=wrong-import-position
 
 """
 Provides a python client for simply retrieving 
