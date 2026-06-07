@@ -66,6 +66,10 @@ class DataManager:
             self._cache_dir_path,
             const.CACHE_FILE_NAME
         )
+        self._nominatim_cache_file_path = os.path.join(
+            self._cache_dir_path,
+            const.NOMINATIM_CACHE_FILE_NAME
+        )
         self._etags = {}
 
 
@@ -585,3 +589,71 @@ class DataManager:
         except OSError as exc:
             _warn(f"Could not read cache file modification time: {exc}")
             return None
+
+
+    def load_nominatim_cache(self) -> dict:
+        """
+        Load Nominatim coordinate cache from disk.
+
+        :return: Dictionary of city_name -> (latitude, longitude) coordinates
+        :rtype: dict
+        """
+        if self._disable_caching:
+            return {}
+
+        try:
+            if os.path.exists(self._nominatim_cache_file_path):
+                with open(self._nominatim_cache_file_path, "r", encoding="utf-8") as file:
+                    cache_data = json.load(file)
+                    result = {}
+
+                    for city_name, coords in cache_data.items():
+                        if isinstance(coords, list) and len(coords) == 2:
+                            result[city_name] = tuple(coords)
+
+                    _LOGGER.debug(
+                        "Loaded %d cached Nominatim coordinates from disk.",
+                        len(result)
+                    )
+
+                    return result
+        except (json.JSONDecodeError, OSError) as exc:
+            _LOGGER.debug("Failed to load Nominatim cache: %s", exc)
+
+        return {}
+
+
+    def save_nominatim_cache(self, city_coordinate_cache: dict) -> None:
+        """
+        Save Nominatim coordinate cache to disk.
+
+        :param city_coordinate_cache: Dictionary of city_name -> (latitude, longitude) coordinates
+        :type city_coordinate_cache: dict
+        """
+        if self._disable_caching or not city_coordinate_cache:
+            return
+
+        try:
+            os.makedirs(
+                self._cache_dir_path,
+                exist_ok=True,
+                mode=0o700  # rwx only for the owner (dir)
+            )
+
+            cache_data = {
+                city_name: list(coords)
+                for city_name, coords in city_coordinate_cache.items()
+            }
+
+            with open(self._nominatim_cache_file_path, "w", encoding="utf-8") as file:
+                json.dump(cache_data, file, ensure_ascii=False)
+
+            # rwx only for the owner (file)
+            os.chmod(self._nominatim_cache_file_path, 0o600)
+
+            _LOGGER.debug(
+                "Saved %d Nominatim coordinates to cache.",
+                len(city_coordinate_cache)
+            )
+        except (OSError, json.JSONDecodeError) as exc:
+            _warn(f"Failed to save Nominatim cache: {exc}")

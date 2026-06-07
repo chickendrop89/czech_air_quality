@@ -764,6 +764,7 @@ class AirQualityCalculations:
                 )
 
                 self._city_coordinate_cache[city_name] = coords
+                self._data_manager.save_nominatim_cache(self._city_coordinate_cache)
                 _LOGGER.debug("Successfully geocoded '%s'.", city_name)
                 return coords
 

@@ -100,6 +100,7 @@ class AirQuality(AirQualityCalculations):
         self._nominatim_timeout = nominatim_timeout
 
         if self._use_nominatim:
+            self._city_coordinate_cache = self._data_manager.load_nominatim_cache()
             self._geolocator = Nominatim(
                 user_agent=const.USER_AGENT
             )

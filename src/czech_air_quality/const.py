@@ -32,6 +32,7 @@ ETAG_URLS = {
 
 CACHE_DIR_NAME = "czech_air_quality"
 CACHE_FILE_NAME = "airquality_opendata_cache.json"
+NOMINATIM_CACHE_FILE_NAME = "nominatim_coordinates_cache.json"
 CACHE_METADATA_KEY = "__cache_metadata__"
 
 TIMESTAMP_KEY = "timestamp"
