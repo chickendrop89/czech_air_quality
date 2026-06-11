@@ -4,7 +4,6 @@ py-version=3.10
 clear-cache-post-run=no
 jobs=0
 persistent=yes
-suggestion-mode=yes
 load-plugins=pylint.extensions.check_elif,
              pylint.extensions.docparams,
              pylint.extensions.for_any_all,
