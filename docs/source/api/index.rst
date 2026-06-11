@@ -22,6 +22,8 @@ this library uses a caching mechanism with the following strategy:
     - If server returns **200 (Modified)**, download full data
 - **Network Error:** If network unavailable but cache exists, use stale cache with warning
 
+Caching is also done with Nominatim, however it's more basic.
+
 This can be customized:
     - **Force Refreshing:** ``force_fetch_fresh()`` bypasses the age check
     - **Disabling Caching:** By using ``disable_caching=True`` to always fetch fresh data
