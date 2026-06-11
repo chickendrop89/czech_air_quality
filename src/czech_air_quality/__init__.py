@@ -15,8 +15,8 @@
 # pylint: disable=wrong-import-position
 
 """
-Provides a python client for simply retrieving 
-and processing air quality data from the CHMI OpenData portal.
+Provides a python client for retrieving and processing 
+current air quality data from the CHMI OpenData portal.
 """
 
 import warnings

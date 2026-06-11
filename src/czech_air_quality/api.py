@@ -36,7 +36,8 @@ _LOGGER = logging.getLogger(__name__)
 
 class AirQuality(AirQualityCalculations):
     """
-    A client for retrieving air quality data from CHMI.
+    Provides a python client for retrieving and processing 
+    current air quality data from the CHMI OpenData portal.
     """
     def __init__(
         self,
