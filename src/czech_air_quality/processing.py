@@ -1,6 +1,5 @@
-#  Provides a python client for simply retrieving
-#  and processing air quality data from the CHMI OpenData portal.
-#  Copyright (C) 2025 chickendrop89
+#  Python library for processing AQI data from the CHMI OpenData portal.
+#  Copyright (C) 2026 chickendrop89
 
 #  This library is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU Lesser General Public License as published by
