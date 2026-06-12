@@ -18,9 +18,9 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
 project = "czech_air_quality"
-copyright = "chickendrop89, 2025"
+copyright = "chickendrop89, 2026"
 author = "chickendrop89"
-release = "2.0.1"
+release = "2.0.3"
 
 extensions = [
     "sphinx.ext.autodoc",
