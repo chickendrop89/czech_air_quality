@@ -27,7 +27,8 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
-    'sphinx_sitemap'
+    'sphinx_sitemap',
+    "sphinxext.opengraph"
 ]
 
 autodoc_default_options = {
@@ -52,6 +53,11 @@ html_theme_options = {
     "style_external_links": False,
     "vcs_pageview_mode": ""
 }
+
+ogp_site_url = html_baseurl
+ogp_site_name = "czech_air_quality documentation"
+ogp_type = "website"
+ogp_social_cards = {}
 
 pygments_style = "sphinx"
 language = "en"

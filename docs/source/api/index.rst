@@ -4,6 +4,8 @@ API References
 .. meta::
    :description: API references of the czech_air_quality python library.
    :keywords: air-quality, aq, aqi, chmi, chmu, czech, eaqi, isko, library, opendata, python
+   :robots: index, follow
+   :content-language": en
 
 .. toctree::
    :maxdepth: 2
