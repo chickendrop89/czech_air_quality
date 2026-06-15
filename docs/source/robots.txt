@@ -3,5 +3,7 @@ Disallow: /sitemap.xml
 Disallow: /en/stable/
 Disallow: /_sources/
 Disallow: /*_sources/*
+Disallow: /_/downloads/
+Disallow: */_/downloads/*
 
 Sitemap: https://czech-air-quality.readthedocs.io/en/latest/custom_sitemap.xml
