@@ -1,5 +1,5 @@
 #  Python library for processing AQI data from the CHMI OpenData portal.
-#  Copyright (C) 2026 chickendrop89
+#  Copyright (C) 2026 chkndrp
 
 #  This library is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU Lesser General Public License as published by
@@ -18,8 +18,8 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
 project = "czech_air_quality"
-copyright = "chickendrop89, 2026"
-author = "chickendrop89"
+copyright = "chkndrp, 2026"
+author = "chkndrp"
 release = "2.0.3"
 
 extensions = [

@@ -8,7 +8,7 @@ version = "2.0.3"
 description = "Python library for retrieving and processing current air quality data from the CHMI OpenData portal."
 readme = "README.md"
 authors = [
-    { name = "chickendrop89", email = "chickendrop89@gmail.com" }
+    { name = "chkndrp", email = "chkndrp@gmail.com" }
 ]
 license = { file = "LICENSE" }
 keywords = ["air-quality", "chmi", "czechia", "pollution", "aqi", "eaqi", "geopy", "isko"]
@@ -30,9 +30,9 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/chickendrop89/czech_air_quality"
-Issues     = "https://github.com/chickendrop89/czech_air_quality/issues"
-Changelog  = "https://github.com/chickendrop89/czech_air_quality/blob/master/CHANGELOG.md"
+Repository = "https://github.com/chkndrp/czech_air_quality"
+Issues     = "https://github.com/chkndrp/czech_air_quality/issues"
+Changelog  = "https://github.com/chkndrp/czech_air_quality/blob/master/CHANGELOG.md"
 Homepage   = "https://czech-air-quality.readthedocs.io"
 
 [project.optional-dependencies]

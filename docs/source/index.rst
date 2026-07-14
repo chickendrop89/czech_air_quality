@@ -34,4 +34,4 @@ Useful Links
 ============
 
 - `PyPi package page <https://pypi.org/project/czech-air-quality/>`_
-- `GitHub Repository <https://github.com/chickendrop89/czech_air_quality>`_
+- `GitHub Repository <https://github.com/chkndrp/czech_air_quality>`_

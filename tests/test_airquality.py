@@ -1,5 +1,5 @@
 #  Python library for processing AQI data from the CHMI OpenData portal.
-#  Copyright (C) 2026 chickendrop89
+#  Copyright (C) 2026 chkndrp
 
 #  This library is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU Lesser General Public License as published by
