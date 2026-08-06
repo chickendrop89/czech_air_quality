@@ -27,7 +27,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
-    'sphinx_sitemap',
+    "sphinx_sitemap",
     "sphinxext.opengraph",
     "sphinx_llms_txt",
 ]
@@ -45,7 +45,7 @@ autodoc_typehints_format = "short"
 typehints_fully_qualified = False
 typehints_use_rtype = True
 
-html_extra_path = ['robots.txt', 'custom_sitemap.xml']
+html_extra_path = ["robots.txt", "custom_sitemap.xml"]
 html_baseurl = 'https://czech-air-quality.readthedocs.io/en/latest/'
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {
