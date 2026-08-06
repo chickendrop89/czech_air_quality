@@ -6,4 +6,4 @@ Disallow: /*_sources/*
 Disallow: /_/downloads/
 Disallow: */_/downloads/*
 
-Sitemap: https://czech-air-quality.readthedocs.io/en/latest/custom_sitemap.xml
+Sitemap: https://czech-air-quality.readthedocs.io/en/latest/sitemap.xml

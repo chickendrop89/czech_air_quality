@@ -27,7 +27,6 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
-    "sphinx_sitemap",
     "sphinxext.opengraph",
     "sphinx_llms_txt",
 ]
@@ -45,14 +44,14 @@ autodoc_typehints_format = "short"
 typehints_fully_qualified = False
 typehints_use_rtype = True
 
-html_extra_path = ["robots.txt", "custom_sitemap.xml"]
-html_baseurl = 'https://czech-air-quality.readthedocs.io/en/latest/'
+html_extra_path = ["robots.txt", "sitemap.xml"]
+html_baseurl = "https://czech-air-quality.readthedocs.io/en/latest/"
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {
     "logo_only": False,
     "prev_next_buttons_location": "bottom",
     "style_external_links": False,
-    "vcs_pageview_mode": ""
+    "vcs_pageview_mode": "",
 }
 
 ogp_site_url = html_baseurl
