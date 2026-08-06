@@ -28,7 +28,8 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
     'sphinx_sitemap',
-    "sphinxext.opengraph"
+    "sphinxext.opengraph",
+    "sphinx_llms_txt",
 ]
 
 autodoc_default_options = {
