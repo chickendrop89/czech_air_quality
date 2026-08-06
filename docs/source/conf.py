@@ -60,5 +60,6 @@ ogp_site_name = "czech_air_quality documentation"
 ogp_type = "website"
 ogp_social_cards = {}
 
+templates_path = ["templates"]
 pygments_style = "sphinx"
 language = "en"
